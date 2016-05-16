@@ -12,6 +12,13 @@ public class Prueba1 extends RectShape{
 
     private List<Str>
     mSaludo = new ArrayList<>();
+    public static final String  HOLA = "Hola Prueba1";
+
+
+    //
+    // CONSTRUCTORS
+    //
+
 
     public Prueba1() {
 
