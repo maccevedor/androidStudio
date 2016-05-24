@@ -1,5 +1,6 @@
 package maccevedor.maveru;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,32 +15,54 @@ import android.widget.ListView;
 
 public class MainActivity extends AppCompatActivity {
     private ListView mListView;
+    private MainDBAdapter mDBAdapter;
+    private MainSimpleCursorAdapter mCursorAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mListView = (ListView) findViewById(R.id.avisos_list_view);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-                this,
+        findViewById(R.id.avisos_list_view);
+        mListView.setDivider(null);
+        mDBAdapter = new MainDBAdapter(this);
+        mDBAdapter.open();
+
+        if(savedInstanceState == null){
+            mDBAdapter.deleteAllReminders();
+            mDBAdapter.createReminder("1",true);
+            mDBAdapter.createReminder("2",true);
+            mDBAdapter.createReminder("3",false);
+            mDBAdapter.createReminder("4",true);
+
+        }
+
+
+        Cursor cursor = mDBAdapter.fetchAllReminders();
+        String[] from = new String[]{
+                MainDBAdapter.COL_CONTENT
+        };
+
+        int[] to = new int[]{
+            R.id.row_text
+        };
+
+        mCursorAdapter = new MainSimpleCursorAdapter(
+                //content
+                MainActivity.this,
                 R.layout.avisos_row,
-                R.id.row_text,
-                new String[]{"1","2"}
-
-
+                cursor,
+                from,
+                to,
+                0
         );
-        mListView.setAdapter(arrayAdapter);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+
+        mListView.setAdapter(mCursorAdapter);
     }
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
