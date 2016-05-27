@@ -10,8 +10,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private ListView mListView;
@@ -31,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(savedInstanceState == null){
             mDBAdapter.deleteAllReminders();
-            mDBAdapter.createReminder("1",true);
+            mDBAdapter.createReminder("0",true);
             mDBAdapter.createReminder("2",true);
             mDBAdapter.createReminder("3",false);
             mDBAdapter.createReminder("4",true);
@@ -59,6 +61,20 @@ public class MainActivity extends AppCompatActivity {
         );
 
         mListView.setAdapter(mCursorAdapter);
+
+
+        mListView.setOnItemClickListener(new  AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, "pulsado" + position,
+                        Toast.LENGTH_SHORT).show();
+
+            }
+
+
+
+        });
     }
 
 
