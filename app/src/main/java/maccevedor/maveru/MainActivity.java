@@ -1,9 +1,11 @@
 package maccevedor.maveru;
 
+import android.app.Dialog;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -31,50 +33,70 @@ public class MainActivity extends AppCompatActivity {
         mDBAdapter = new MainDBAdapter(this);
         mDBAdapter.open();
 
-        if(savedInstanceState == null){
-            mDBAdapter.deleteAllReminders();
-            mDBAdapter.createReminder("0",true);
-            mDBAdapter.createReminder("2",true);
-            mDBAdapter.createReminder("3",false);
-            mDBAdapter.createReminder("4",true);
 
-        }
+        // cuando pulsamos un item individual en la  listview
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            public void onItemClick(AdapterView<?> parent, View view, final int masterListPosition, long id) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                ListView modeListView = new ListView(MainActivity.this);
+                String[] modes = new String[] { "Editar Aviso", "Borrar Aviso" };
+                ArrayAdapter<String> modeAdapter = new ArrayAdapter<>(MainActivity.this,
+                        android.R.layout.simple_list_item_1, android.R.id.text1, modes);
+                modeListView.setAdapter(modeAdapter);
+                builder.setView(modeListView);
+                final Dialog dialog = builder.create();
+                dialog.show();
+                modeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        //editar aviso
+                        if (position == 0) {
+                            Toast.makeText(MainActivity.this, "editar "
+                                    + masterListPosition, Toast.LENGTH_SHORT).show();
+                            //borrar aviso
+                        } else {
+                            Toast.makeText(MainActivity.this, "borrar "
+                                    + masterListPosition, Toast.LENGTH_SHORT).show();
+                        }
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+
+
 
 
         Cursor cursor = mDBAdapter.fetchAllReminders();
+
+        //desde las columnas definidas en la base de datos
         String[] from = new String[]{
                 MainDBAdapter.COL_CONTENT
         };
 
+        //a la id de views en el layout
         int[] to = new int[]{
-            R.id.row_text
+                R.id.row_text
         };
 
         mCursorAdapter = new MainSimpleCursorAdapter(
-                //content
+                //context
                 MainActivity.this,
+                //el layout de la fila
                 R.layout.avisos_row,
+                //cursor
                 cursor,
+                //desde columnas definidas en la base de datos
                 from,
+                //a las ids de views en el layout
                 to,
-                0
-        );
+                //flag - no usado
+                0);
 
+        //el cursorAdapter (controller) está ahora actualizando la listView (view)
+        //con datos desde la base de datos (modelo)
         mListView.setAdapter(mCursorAdapter);
-
-
-        mListView.setOnItemClickListener(new  AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, "pulsado" + position,
-                        Toast.LENGTH_SHORT).show();
-
-            }
-
-
-
-        });
     }
 
 
