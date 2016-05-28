@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -38,11 +39,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setIcon(R.mipmap.ic_launcher);
+
         mListView = (ListView) findViewById(R.id.avisos_list_view);
         findViewById(R.id.avisos_list_view);
         mListView.setDivider(null);
         mDBAdapter = new MainDBAdapter(this);
         mDBAdapter.open();
+
 
 
         // cuando pulsamos un item individual en la  listview
@@ -63,8 +70,9 @@ public class MainActivity extends AppCompatActivity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         //editar aviso
                         if (position == 0) {
-                            Toast.makeText(MainActivity.this, "editar "
-                                    + masterListPosition, Toast.LENGTH_SHORT).show();
+                            int nId = getIdFromPosition(masterListPosition);
+                            Main aviso = mDBAdapter.fetchReminderById(nId);
+                            fireCustomDialog(aviso);
                             //borrar aviso
                         } else {
                             Toast.makeText(MainActivity.this, "borrar "
@@ -221,12 +229,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_nuevo:
-                Log.d(getLocalClassName(),"Crear Nuevo Aviso");
+                //crear nuevo Aviso
+                fireCustomDialog(null);
                 return true;
             case R.id.action_salir:
                 finish();
